@@ -12,11 +12,11 @@ jobs:
     steps:
     - name: ssh to the basion
       run: |
-        ssh azuresuer@20.63.24.50
-    - name: ssh to the basion
-      run: |
-        ssh azureuser@10.0.0.4
-        ls
+        ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "mv -r ./git_app_1 ./backup/lastBackup/"'
+    # - name: ssh to the basion
+    #   run: |
+    #     ssh azureuser@10.0.0.4
+    #     ls
   
     # - name: Checkout code
     #   uses: actions/checkout@v3
@@ -29,7 +29,7 @@ jobs:
     #   run: |
         
     #     echo "backup the soruce code in vm..."
-    #     ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "mv -r ./git_app_1 ./backup/lastBackup/"'
+        # ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "mv -r ./git_app_1 ./backup/lastBackup/"'
     #     echo "remove the real code from the vm..."
     #     scp -r ./git_app_1.tar.gz "ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "/home/azureuser/backup/newChanges"'"
         
