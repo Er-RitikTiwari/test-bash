@@ -23,8 +23,7 @@ jobs:
 
     - name: check code
       run : |
-       cd ..
-       ls
+       pwd
   
     # - name: Tar the source code
     #   run: |
