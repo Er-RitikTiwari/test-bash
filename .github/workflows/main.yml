@@ -8,22 +8,28 @@ on:
 jobs:
   basion-buld-deploy:
     runs-on: [self-hosted]
-
+    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - name: ssh to the basion
+      run: |
+        ssh azuresuer@20.63.24.50
+        ssh azureuser@10.0.0.4
+        ls
   
-    - name: Tar the source code
-      run: |
-        tar -czf git_app_1.tar.gz .
+    # - name: Checkout code
+    #   uses: actions/checkout@v3
+  
+    # - name: Tar the source code
+    #   run: |
+    #     tar -czf git_app_1.tar.gz .
         
-    - name: Backup the sorce code file from the vm
-      run: |
+    # - name: Backup the sorce code file from the vm
+    #   run: |
         
-        echo "backup the soruce code in vm..."
-        ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "mv -r ./git_app_1 ./backup/lastBackup/"'
-        echo "remove the real code from the vm..."
-        scp -r ./git_app_1.tar.gz "ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "/home/azureuser/backup/newChanges"'"
+    #     echo "backup the soruce code in vm..."
+    #     ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "mv -r ./git_app_1 ./backup/lastBackup/"'
+    #     echo "remove the real code from the vm..."
+    #     scp -r ./git_app_1.tar.gz "ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "/home/azureuser/backup/newChanges"'"
         
     
    
