@@ -12,7 +12,7 @@ jobs:
     steps:
     - name: ssh to the basion
       run: |
-        ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "mv -r ./git_app_1 ./backup/lastBackup/"'
+        ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "ls"'
     # - name: ssh to the basion
     #   run: |
     #     ssh azureuser@10.0.0.4
