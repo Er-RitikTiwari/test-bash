@@ -13,6 +13,8 @@ jobs:
     - name: ssh to the basion
       run: |
         ssh azuresuer@20.63.24.50
+    - name: ssh to the basion
+      run: |
         ssh azureuser@10.0.0.4
         ls
   
