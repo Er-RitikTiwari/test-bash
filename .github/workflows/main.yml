@@ -1,9 +1,9 @@
-name: Deploy via Self-hosted Runner
+name: MERN App CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+
 jobs:
   deploy:
     runs-on: [self-hosted]
@@ -12,9 +12,58 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: List files in private VM via Bastion
+    - name: Create zip of new code
       run: |
-        ssh private-vm "ls"
+        zip -r new_code.zip . -x "*.git*" "node_modules/*"
+
+    - name: Send new zip to VM (via bastion)
+      run: |
+        rsync -avz -e "ssh -J ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}" \
+          new_code.zip \
+          ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:~/backup/newChanges/
+
+    - name: SSH to VM and run backup + deploy script
+      run: |
+        ssh -J ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} \
+          ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+            set -e
+            echo "Zipping current git_app_1 to lastBackup..."
+            cd ~
+            rm -f backup/lastBackup/old_code.zip
+            zip -r backup/lastBackup/old_code.zip git_app_1
+
+            echo "Removing current git_app_1 folder..."
+            rm -rf git_app_1
+
+            echo "Extracting new code..."
+            unzip backup/newChanges/new_code.zip -d git_app_1
+
+            echo "Installing and building..."
+            cd git_app_1
+            npm install
+            npm run build
+            sudo systemctl restart nginx
+        EOF
+
+
+
+# name: Deploy via Self-hosted Runner
+
+# on:
+#   push:
+#     branches:
+#       - main
+# jobs:
+#   deploy:
+#     runs-on: [self-hosted]
+
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+
+#     - name: List files in private VM via Bastion
+#       run: |
+#         ssh private-vm "ls"
 
 # jobs:
 #   basion-buld-deploy:
