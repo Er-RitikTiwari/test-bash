@@ -4,26 +4,37 @@ on:
   push:
     branches:
       - main
-
 jobs:
-  basion-buld-deploy:
+  deploy:
     runs-on: [self-hosted]
-    
+
     steps:
-    - name: ssh to the basion
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: List files in private VM via Bastion
       run: |
-        ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "ls"'
+        ssh private-vm "ls /home/azureuser/git_app_1"
+
+# jobs:
+#   basion-buld-deploy:
+#     runs-on: [self-hosted]
+    
+#     steps:
+#     - name: ssh to the basion
+#       run: |
+        # ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "ls"'
     # - name: ssh to the basion
     #   run: |
     #     ssh azureuser@10.0.0.4
     #     ls
   
-    - name: Checkout code
-      uses: actions/checkout@v3
+    # - name: Checkout code
+    #   uses: actions/checkout@v3
 
-    - name: check code
-      run : |
-       pwd
+    # - name: check code
+    #   run : |
+    #    pwd
   
     # - name: Tar the source code
     #   run: |
