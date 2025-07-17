@@ -15,12 +15,18 @@ jobs:
     - name: Create zip of new code
       run: |
         zip -r new_code.zip . -x "*.git*" "node_modules/*"
+        
+    - name: Start SSH agent and add key
+      run: |
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/id_rsa
 
     - name: Send new zip to VM (via bastion)
       run: |
-        rsync -avz -e "ssh -J ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}" \
-          new_code.zip \
-          ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:~/backup/newChanges/
+        rsync -avz -e "ssh -A -J azureuser@20.63.24.50 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+        new_code.zip \
+        azureuser@10.0.0.4:~/backup/newChanges/
+
 
     - name: SSH to VM and run backup + deploy script
       run: |
