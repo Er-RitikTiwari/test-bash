@@ -27,36 +27,65 @@ jobs:
     #     -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
     #     new_code.zip \
     #     azureuser@10.0.0.4:~/backup/newChanges/
-
+    - name: Delete the old code from the vm
+      run: |
+        ssh azureuser@20.63.24.50 'ssh azureuser@10.0.0.4 "rm -r /home/azureuser/backup/newChanges/*"'
+        
     - name: Send new zip to VM (via bastion)
       run: |
         sshpass -p "${{ secrets.VM_PASSWORD }}" rsync -avz -e "ssh -A -J azureuser@20.63.24.50 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
         new_code.zip \
         azureuser@10.0.0.4:~/backup/newChanges/
 
-
-    - name: SSH to VM and run backup + deploy script
+    - name: ssh to vm and run backup + deploy script
       run: |
-        ssh -J ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} \
-          ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            set -e
-            echo "Zipping current git_app_1 to lastBackup..."
-            cd ~
-            rm -f backup/lastBackup/old_code.zip
-            zip -r backup/lastBackup/old_code.zip git_app_1
+       ssh azureuser@20.63.24.50 << 'EOF1'
+        ssh azureuser@10.0.0.4 << 'EOF2'
+          set -e
+          echo "Zipping current git_app_1 to lastBackup..."
+          cd ~
+          DATE=$(date +%Y-%m-%d)
+          zip -r backup/lastBackup/old_code_$DATE.zip git_app_1
 
-            echo "Removing current git_app_1 folder..."
-            rm -rf git_app_1
+          echo "Removing current git_app_1 folder..."
+          rm -rf git_app_1
 
-            echo "Extracting new code..."
-            unzip backup/newChanges/new_code.zip -d git_app_1
+          echo "Extracting new code..."
+          unzip backup/newChanges/new_code.zip -d git_app_1
 
-            echo "Installing and building..."
-            cd git_app_1
-            npm install
-            npm run build
-            sudo systemctl restart nginx
-        EOF
+          echo "Installing and building..."
+          cd git_app_1
+          npm install
+          npm run build
+          sudo systemctl restart nginx
+       EOF2
+       EOF1
+
+      
+
+
+    # - name: SSH to VM and run backup + deploy script
+    #   run: |
+    #     ssh -J ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} \
+    #       ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+    #         set -e
+    #         echo "Zipping current git_app_1 to lastBackup..."
+    #         cd ~
+    #         rm -f backup/lastBackup/old_code.zip
+    #         zip -r backup/lastBackup/old_code.zip git_app_1
+
+    #         echo "Removing current git_app_1 folder..."
+    #         rm -rf git_app_1
+
+    #         echo "Extracting new code..."
+    #         unzip backup/newChanges/new_code.zip -d git_app_1
+
+    #         echo "Installing and building..."
+    #         cd git_app_1
+    #         npm install
+    #         npm run build
+    #         sudo systemctl restart nginx
+    #     EOF
 
 
 
