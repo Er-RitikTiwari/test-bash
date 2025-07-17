@@ -20,10 +20,17 @@ jobs:
       run: |
         eval "$(ssh-agent -s)"
         ssh-add ~/.ssh/id_rsa
+        
+    # - name: Copy new zip to remote VM
+    #   run: |
+    #     sshpass -p "${{ secrets.VM_PASSWORD }}" rsync -avz \
+    #     -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+    #     new_code.zip \
+    #     azureuser@10.0.0.4:~/backup/newChanges/
 
     - name: Send new zip to VM (via bastion)
       run: |
-        rsync -avz -e "ssh -A -J azureuser@20.63.24.50 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+        sshpass -p "${{ secrets.VM_PASSWORD }}" rsync -avz -e "ssh -A -J azureuser@20.63.24.50 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
         new_code.zip \
         azureuser@10.0.0.4:~/backup/newChanges/
 
